@@ -1,0 +1,63 @@
+# Codeception Test Suite Configuration
+#
+# Suite for acceptance tests.
+# Perform tests in browser using the WebDriver or PhpBrowser.
+# If you need both WebDriver and PHPBrowser tests - create a separate suite.
+
+actor: AcceptanceTester
+modules:
+  enabled:
+    - WebDriver
+    - Asserts
+  config:
+    WebDriver:
+      url: 'http://localhost'
+      browser: firefox
+env:
+  # https://codeception.com/docs/modules/WebDriver#ChromeDriver
+  chrome:
+    modules:
+      config:
+        WebDriver:
+          url: 'http://localhost'
+          window_size: false # disabled in ChromeDriver
+          port: 9515
+          browser: chrome
+          #wait: 5
+          capabilities:
+            chromeOptions: # additional chrome options
+              args: [ "--disable-web-security","--start-fullscreen","--disable-translate","--disable-translate-new-ux","--no-sandbox","--headless","window-size=1024,768","--disable-infobars","--lang=en" ]
+              #binary: "/usr/bin/google-chrome-stable"
+  firefox:
+    modules:
+      config:
+        WebDriver:
+          url: 'http://localhost'
+          browser: firefox
+          path: ''
+          capabilities:
+            unexpectedAlertBehaviour: 'accept'
+            acceptInsecureCerts: true # allow self-signed certificates
+            moz:firefoxOptions:
+              args: [ "--headless" ] # Run Firefox in headless mode
+              prefs:
+                intl.accept_languages: "en-US"
+#                                intl.accept_languages: "de-AT" # Set HTTP-Header `Accept-Language: de-AT` for requests
+gherkin:
+  contexts:
+    default:
+      - Tests\Support\Acceptance\DefaultSteps
+    tag:
+      snapshot:
+        - Tests\Support\Acceptance\Snapshot
+#            checkout:
+#                - Tests\Support\Acceptance\Checkout
+extensions:
+  enabled:
+    - Codeception\Extension\RunProcess:
+        - rm -rf tests/_output/*
+        - ./geckodriver --port=4444
+#              - ./chromedriver --url-base=/wd/hub --whitelisted-ips= --verbose --port=4444
+#    - Codeception\Extension\Recorder:
+#        delete_successful: false
+step_decorators: ~
